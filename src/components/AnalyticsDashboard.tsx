@@ -47,6 +47,18 @@ const chartConfig = {
     label: "Diseased Scans",
     color: "hsl(var(--chart-2))",
   },
+  value: { // Added for trend data, if needed by legend/tooltip
+    label: "Trend Value",
+    color: "hsl(var(--primary))",
+  },
+  scans: { // Added for scan volume, if needed
+    label: "Scans",
+    color: "hsl(var(--primary))",
+  },
+  rate: { // Added for recovery rate, if needed
+    label: "Recovery Rate",
+    color: "hsl(var(--chart-1))",
+  }
 } satisfies ChartConfig
 
 const MotionCard = motion(Card)
@@ -123,7 +135,7 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                   {isLoading ? (
                     <Skeleton className="w-full h-full rounded-md" />
                   ) : (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ChartContainer config={chartConfig} className="w-full h-full">
                       <AreaChart data={sampleChartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                         <defs>
                           <linearGradient id="healthyGradient" x1="0" y1="0" x2="0" y2="1">
@@ -143,7 +155,7 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                         <Area type="monotone" dataKey="healthy" stroke="hsl(var(--chart-1))" strokeWidth={2} fillOpacity={1} fill="url(#healthyGradient)" />
                         <Area type="monotone" dataKey="diseased" stroke="hsl(var(--chart-2))" strokeWidth={2} fillOpacity={1} fill="url(#diseasedGradient)" />
                       </AreaChart>
-                    </ResponsiveContainer>
+                    </ChartContainer>
                   )}
                 </motion.div>
               </CardContent>
@@ -249,7 +261,7 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                             <motion.div 
                               className="h-full bg-primary/80 rounded-full"
                               initial={{ width: 0 }}
-                              animate={{ width: `${(issue.count / summary.totalScans) * 100}%` }}
+                              animate={{ width: `${(issue.count / (summary.totalScans || 1)) * 100}%` }} // Added guard for totalScans = 0
                               transition={{ duration: 0.8, delay: index * 0.1 }}
                             />
                           </div>
@@ -270,11 +282,11 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
           <MotionCard {...staggerAnimation(0)} className="shadow-md hover:shadow-lg transition-shadow duration-300">
             <CardHeader>
               <CardTitle>Plant Health Trends</CardTitle>
-              <CardDescription>6-month tracking of scan health patterns</CardDescription>
+              <CardDescription>6-month tracking of scan health patterns (Sample Data)</CardDescription>
             </CardHeader>
             <CardContent>
               <motion.div {...chartAnimation} className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer config={chartConfig} className="w-full h-full">
                   <LineChart data={trendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
@@ -294,9 +306,8 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                       dot={{ fill: "hsl(var(--primary))", r: 4 }}
                       activeDot={{ r: 6, fill: "hsl(var(--primary))" }}
                     />
-                
                   </LineChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </motion.div>
             </CardContent>
           </MotionCard>
@@ -305,11 +316,11 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
             <MotionCard {...staggerAnimation(1)} className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Scan Volume Analysis</CardTitle>
-                <CardDescription>Weekly scan frequency distribution</CardDescription>
+                <CardDescription>Weekly scan frequency (Sample Data)</CardDescription>
               </CardHeader>
               <CardContent>
                 <motion.div {...chartAnimation} className="h-[200px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                   <ChartContainer config={chartConfig} className="w-full h-full">
                     <BarChart 
                       data={[
                         { day: "Mon", scans: 12 },
@@ -333,7 +344,7 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                         barSize={30}
                       />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </motion.div>
               </CardContent>
             </MotionCard>
@@ -341,11 +352,11 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
             <MotionCard {...staggerAnimation(2)} className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Issue Recovery Rate</CardTitle>
-                <CardDescription>Treatment success over time</CardDescription>
+                <CardDescription>Treatment success over time (Sample Data)</CardDescription>
               </CardHeader>
               <CardContent>
                 <motion.div {...chartAnimation} className="h-[200px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer config={chartConfig} className="w-full h-full">
                     <LineChart
                       data={[
                         { week: "W1", rate: 65 },
@@ -370,7 +381,7 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
                         activeDot={{ r: 6, fill: "hsl(var(--chart-1))" }}
                       />
                     </LineChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </motion.div>
               </CardContent>
             </MotionCard>
@@ -394,72 +405,70 @@ export default function AnalyticsDashboard({ summary, isLoading }: AnalyticsDash
             <CardContent>
               <motion.div {...chartAnimation} className="min-h-[350px] w-full">
                 <ChartContainer config={chartConfig} className="min-h-[350px] w-full">
-                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart accessibilityLayer data={sampleChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.2} />
-                      <XAxis
-                        dataKey="month"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        stroke="hsl(var(--muted-foreground))"
-                        fontSize={12}
-                      />
-                      <YAxis 
-                        tickLine={false}
-                        axisLine={false}
-                        stroke="hsl(var(--muted-foreground))"
-                        fontSize={12}
-                        tickFormatter={(value) => `${value}`}
-                      />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dashed" />}
-                      />
-                      <ChartLegend content={<ChartLegendContent />} />
-                      <Bar 
-                        dataKey="healthy" 
-                        fill="hsl(var(--chart-1))" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1500}
-                        barSize={30}
-                      />
-                      <Bar 
-                        dataKey="diseased" 
-                        fill="hsl(var(--chart-2))" 
-                        radius={[4, 4, 0, 0]} 
-                        animationDuration={1500}
-                        barSize={30}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <BarChart accessibilityLayer data={sampleChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.2} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      tickLine={false}
+                      axisLine={false}
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickFormatter={(value) => `${value}`}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent indicator="dashed" />}
+                    />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar 
+                      dataKey="healthy" 
+                      fill="var(--color-healthy)" 
+                      radius={[4, 4, 0, 0]} 
+                      animationDuration={1500}
+                      barSize={30}
+                    />
+                    <Bar 
+                      dataKey="diseased" 
+                      fill="var(--color-diseased)" 
+                      radius={[4, 4, 0, 0]} 
+                      animationDuration={1500}
+                      barSize={30}
+                    />
+                  </BarChart>
                 </ChartContainer>
               </motion.div>
             </CardContent>
           </MotionCard>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {['January', 'February', 'March'].map((month, index) => (
-              <MotionCard key={month} {...staggerAnimation(index + 1)} className="shadow-md hover:shadow-lg transition-all duration-300">
+            {sampleChartData.slice(0,3).map((monthData, index) => ( // Iterate over sampleChartData for consistency
+              <MotionCard key={monthData.month} {...staggerAnimation(index + 1)} className="shadow-md hover:shadow-lg transition-all duration-300">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">{month} Summary</CardTitle>
+                  <CardTitle className="text-sm font-medium">{monthData.month} Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm">Total Scans</span>
-                    <span className="font-medium">{sampleChartData[index].healthy + sampleChartData[index].diseased}</span>
+                    <span className="font-medium">{monthData.healthy + monthData.diseased}</span>
                   </div>
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-sm">Health Ratio</span>
                     <span className="font-medium">
-                      <span className="text-green-500">{Math.round((sampleChartData[index].healthy / (sampleChartData[index].healthy + sampleChartData[index].diseased)) * 100)}%</span>
+                      <span className="text-green-500">{Math.round((monthData.healthy / (monthData.healthy + monthData.diseased)) * 100)}%</span>
                     </span>
                   </div>
                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div 
                       className="h-full bg-green-500 rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${(sampleChartData[index].healthy / (sampleChartData[index].healthy + sampleChartData[index].diseased)) * 100}%` }}
+                      animate={{ width: `${(monthData.healthy / (monthData.healthy + monthData.diseased)) * 100}%` }}
                       transition={{ duration: 0.8, delay: index * 0.1 }}
                     />
                   </div>

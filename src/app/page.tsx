@@ -12,10 +12,10 @@ import type { DiagnosisRecord, AnalyticsSummary } from '@/types';
 import { getDiagnosisHistory, getAnalyticsSummary } from '@/app/actions';
 import { ShieldAlert, CheckCircle2, Microscope, HelpCircle, BarChart as BarChartIcon, CalendarDays, Bell, Info, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'; // Renamed
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { DiagnosisHistoryList } from '@/components/DiagnosisHistoryList';
 
-export default function VerdantVisionDashboardPage() {
+export default function PlantIQDashboardPage() {
   const [results, setResults] = useState<DetectDiseaseOutput | null>(null);
   const [isLoadingDiagnosis, setIsLoadingDiagnosis] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,12 +86,12 @@ export default function VerdantVisionDashboardPage() {
     setUploadedImagePreview(null);
   };
 
-  const [greeting, setGreeting] = useState("Welcome to Verdant Vision");
+  const [greeting, setGreeting] = useState("Welcome to PlantIQ");
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Good Morning! Ready to check your plants?");
-    else if (hour < 18) setGreeting("Good Afternoon! Let's analyze your plant's health.");
-    else setGreeting("Good Evening! Upload a plant image to get started.");
+    if (hour < 12) setGreeting("Good Morning! Ready to check your plants with PlantIQ?");
+    else if (hour < 18) setGreeting("Good Afternoon! Let's analyze your plant's health with PlantIQ.");
+    else setGreeting("Good Evening! Upload an image to get started with PlantIQ.");
   }, []);
 
   const renderSectionTitleIcon = () => {
@@ -103,17 +103,17 @@ export default function VerdantVisionDashboardPage() {
   };
   
   const renderSectionTitle = () => {
-    if (currentSection === 'diagnosis') return 'Analysis Report';
-    if (currentSection === 'analytics') return 'Plant Health Analytics';
-    if (currentSection === 'history') return 'Diagnosis History & Outcomes';
-    return 'Analysis Report';
+    if (currentSection === 'diagnosis') return 'PlantIQ Analysis Report';
+    if (currentSection === 'analytics') return 'PlantIQ Health Analytics';
+    if (currentSection === 'history') return 'PlantIQ Diagnosis History & Outcomes';
+    return 'PlantIQ Analysis Report';
   };
 
   const renderSectionDescription = () => {
-    if (currentSection === 'diagnosis') return 'Detailed findings from the image analysis.';
-    if (currentSection === 'analytics') return 'Visualizing plant health trends and insights over time.';
-    if (currentSection === 'history') return 'Review past diagnoses and track treatment effectiveness.';
-    return 'Detailed findings from the image analysis.';
+    if (currentSection === 'diagnosis') return 'Detailed findings from the PlantIQ image analysis.';
+    if (currentSection === 'analytics') return 'Visualizing plant health trends and insights over time with PlantIQ.';
+    if (currentSection === 'history') return 'Review past PlantIQ diagnoses and track treatment effectiveness.';
+    return 'Detailed findings from the PlantIQ image analysis.';
   }
 
 
@@ -122,7 +122,7 @@ export default function VerdantVisionDashboardPage() {
       <header className="pb-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">{greeting}</h1>
         <p className="mt-1 text-md text-muted-foreground max-w-3xl">
-          Your advanced AI assistant for plant disease detection and management.
+          Your advanced AI assistant for plant disease detection and management, powered by PlantIQ.
           <span className="block text-xs mt-1">
             (For full data persistence, please configure Firebase Firestore in your project.)
           </span>
@@ -142,10 +142,10 @@ export default function VerdantVisionDashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Microscope className="h-6 w-6 text-primary" />
-                  Upload Plant Image
+                  Upload for PlantIQ Analysis
                 </CardTitle>
                 <CardDescription>
-                  Provide a clear image for AI analysis.
+                  Provide a clear image for AI analysis by PlantIQ.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -162,11 +162,11 @@ export default function VerdantVisionDashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Bell className="h-5 w-5 text-accent" />
-                  Recent Alerts
+                  Recent PlantIQ Alerts
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">No new alerts. Your plants seem to be doing well based on recent scans!</p>
+                <p className="text-sm text-muted-foreground">No new alerts. Your plants seem to be doing well based on recent PlantIQ scans!</p>
               </CardContent>
             </Card>
           </div>
@@ -189,10 +189,10 @@ export default function VerdantVisionDashboardPage() {
                   <Skeleton className="h-28 w-full rounded-lg" />
                   <Skeleton className="h-10 w-3/4" />
                   <Skeleton className="h-10 w-1/2" />
-                  <p className="text-center text-primary font-semibold pt-4">Verdant Vision AI is analyzing your plant...</p>
+                  <p className="text-center text-primary font-semibold pt-4">PlantIQ AI is analyzing your plant...</p>
                 </div>
               )}
-              {error && ( // General error display for all sections for simplicity
+              {error && ( 
                 <Alert variant="destructive" className="m-4">
                   <ShieldAlert className="h-5 w-5" />
                   <AlertTitle>Error</AlertTitle>
@@ -205,7 +205,7 @@ export default function VerdantVisionDashboardPage() {
               {!isLoadingDiagnosis && !error && !results && currentSection === 'diagnosis' && (
                 <div className="text-center text-muted-foreground py-12 flex flex-col items-center justify-center h-full">
                   <HelpCircle className="h-16 w-16 mb-4 opacity-70" />
-                  <p className="text-lg">Your plant's health report will appear here.</p>
+                  <p className="text-lg">Your plant's health report by PlantIQ will appear here.</p>
                   <p className="text-sm">Upload an image to begin diagnosis.</p>
                 </div>
               )}
@@ -219,7 +219,7 @@ export default function VerdantVisionDashboardPage() {
             {results && currentSection === 'diagnosis' && (
               <CardFooter className="border-t pt-4">
                  <p className="text-xs text-muted-foreground">
-                    Disclaimer: AI analysis provides suggestions and is not a substitute for professional advice.
+                    Disclaimer: PlantIQ AI analysis provides suggestions and is not a substitute for professional advice.
                  </p>
               </CardFooter>
             )}
@@ -227,7 +227,7 @@ export default function VerdantVisionDashboardPage() {
                 <CardFooter className="border-t pt-4">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <Info className="h-3 w-3"/>
-                        {currentSection === 'history' ? 'Diagnosis history is currently session-based. ' : 'Analytics are based on session data. '}
+                        {currentSection === 'history' ? 'PlantIQ diagnosis history is currently session-based. ' : 'PlantIQ analytics are based on session data. '}
                         Configure Firebase for persistent storage.
                     </p>
                 </CardFooter>

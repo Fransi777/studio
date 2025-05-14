@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Verdant Vision',
-  description: 'AI-powered plant disease detection',
+  title: 'PlantIQ',
+  description: 'Intelligent plant disease diagnostics by PlantIQ',
 };
 
 export default function RootLayout({

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, UploadCloud, XCircle, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { performDiseaseDetectionAndSave } from "@/app/actions"; // Updated action
+import { performDiseaseDetectionAndSave } from "@/app/actions";
 import type { DetectDiseaseOutput } from "@/ai/flows/detect-disease";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +123,7 @@ export function ImageUploadForm({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedFile || !previewUrl) { // Ensure previewUrl is also available
+    if (!selectedFile || !previewUrl) { 
       setUploadError("Please select an image file.");
       return;
     }
@@ -133,12 +133,11 @@ export function ImageUploadForm({
 
     try {
       const photoDataUri = await fileToDataUri(selectedFile);
-      // Pass previewUrl to the action for saving
       const result = await performDiseaseDetectionAndSave({ photoDataUri }, previewUrl); 
       
       onDetectionComplete(result, previewUrl);
       toast({
-        title: "Analysis Complete",
+        title: "PlantIQ Analysis Complete",
         description: "Plant health report is ready and saved to history.",
         variant: 'default',
       });
@@ -148,7 +147,7 @@ export function ImageUploadForm({
       onDetectionError(errorMessage);
       toast({
         variant: "destructive",
-        title: "Analysis Failed",
+        title: "PlantIQ Analysis Failed",
         description: errorMessage,
       });
     }
@@ -167,7 +166,7 @@ export function ImageUploadForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label htmlFor="plant-image-upload" className="sr-only">
-          Plant Image Upload
+          Plant Image Upload for PlantIQ
         </label>
         <div
           onDragEnter={handleDragEnter}
@@ -233,12 +232,12 @@ export function ImageUploadForm({
         {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Analyzing Plant...
+            Analyzing with PlantIQ...
           </>
         ) : (
           <>
             <FileImage className="mr-2 h-5 w-5" />
-            Start AI Diagnosis
+            Get PlantIQ Diagnosis
           </>
         )}
       </Button>

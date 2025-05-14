@@ -123,9 +123,7 @@ export default function PlantIQDashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight text-foreground">{greeting}</h1>
         <p className="mt-1 text-md text-muted-foreground max-w-3xl">
           Your advanced AI assistant for plant disease detection and management, powered by PlantIQ.
-          <span className="block text-xs mt-1">
-            (For full data persistence, please configure Firebase Firestore in your project.)
-          </span>
+
         </p>
       </header>
 

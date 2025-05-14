@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -49,7 +50,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { DiagnosisHistoryList } from '@/components/DiagnosisHistoryList';
 import { Input } from '@/components/ui/input';
 

@@ -27,7 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(geistSans.variable, geistMono.variable, "antialiased flex flex-col min-h-screen")}>
+      <body 
+        className={cn(geistSans.variable, geistMono.variable, "antialiased flex flex-col min-h-screen")}
+        suppressHydrationWarning={true}
+      >
         <AppHeader />
         <main className="flex-grow container mx-auto px-4 py-8">
           {children}

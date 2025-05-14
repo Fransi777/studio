@@ -9,6 +9,7 @@ import type { DetectDiseaseOutput } from '@/ai/flows/detect-disease';
 import { Smile, Frown, Info, Leaf, ShieldCheck, ShieldAlert, Sparkles, MessageSquareWarning, Bot } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ResourceLinks } from './ResourceLinks'; // Assuming ResourceLinks is updated or still relevant
+import { cn } from "@/lib/utils";
 
 interface DiseaseResultsProps {
   diagnoses: DetectDiseaseOutput['diagnoses'];

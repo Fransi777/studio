@@ -1,26 +1,68 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ImageUploadForm } from '@/components/ImageUploadForm';
 import { DiseaseResults } from '@/components/DiseaseResults';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { DetectDiseaseOutput } from '@/ai/flows/detect-disease';
-import { ShieldAlert, CheckCircle2, Microscope, HelpCircle, LineChart, CalendarDays, Bell, BarChart as BarChartIcon } from 'lucide-react';
+import type { DiagnosisRecord, AnalyticsSummary } from '@/types';
+import { getDiagnosisHistory, getAnalyticsSummary } from '@/app/actions';
+import { ShieldAlert, CheckCircle2, Microscope, HelpCircle, BarChart as BarChartIcon, CalendarDays, Bell, Info, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AnalyticsChartPlaceholder } from '@/components/AnalyticsChartPlaceholder';
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard'; // Renamed
+import { DiagnosisHistoryList } from '@/components/DiagnosisHistoryList';
 
 export default function VerdantVisionDashboardPage() {
   const [results, setResults] = useState<DetectDiseaseOutput | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDiagnosis, setIsLoadingDiagnosis] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
+  
   const [currentSection, setCurrentSection] = useState<'diagnosis' | 'analytics' | 'history'>('diagnosis');
 
+  const [diagnosisHistory, setDiagnosisHistory] = useState<DiagnosisRecord[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  
+  const [analyticsSummary, setAnalyticsSummary] = useState<AnalyticsSummary | null>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+
+  const fetchHistory = useCallback(async () => {
+    setIsLoadingHistory(true);
+    try {
+      const historyData = await getDiagnosisHistory();
+      setDiagnosisHistory(historyData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load history.");
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, []);
+
+  const fetchAnalytics = useCallback(async () => {
+    setIsLoadingAnalytics(true);
+    try {
+      const summaryData = await getAnalyticsSummary();
+      setAnalyticsSummary(summaryData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load analytics.");
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentSection === 'history') {
+      fetchHistory();
+    } else if (currentSection === 'analytics') {
+      fetchAnalytics();
+    }
+  }, [currentSection, fetchHistory, fetchAnalytics]);
+
   const handleDetectionStart = () => {
-    setIsLoading(true);
+    setIsLoadingDiagnosis(true);
     setError(null);
     setResults(null);
     setUploadedImagePreview(null); 
@@ -29,14 +71,17 @@ export default function VerdantVisionDashboardPage() {
   const handleDetectionComplete = (data: DetectDiseaseOutput, imagePreviewUrl: string) => {
     setResults(data);
     setUploadedImagePreview(imagePreviewUrl);
-    setIsLoading(false);
+    setIsLoadingDiagnosis(false);
     setError(null);
     setCurrentSection('diagnosis'); // Switch to diagnosis view
+    // Optionally refresh history if new diagnosis implies history change
+    if (currentSection === 'history') fetchHistory();
+    if (currentSection === 'analytics') fetchAnalytics();
   };
 
   const handleDetectionError = (errorMessage: string) => {
     setError(errorMessage);
-    setIsLoading(false);
+    setIsLoadingDiagnosis(false);
     setResults(null);
     setUploadedImagePreview(null);
   };
@@ -50,10 +95,10 @@ export default function VerdantVisionDashboardPage() {
   }, []);
 
   const renderSectionTitleIcon = () => {
-    if (isLoading && currentSection === 'diagnosis') return <ShieldAlert className="h-6 w-6 text-primary animate-pulse" />;
+    if (isLoadingDiagnosis && currentSection === 'diagnosis') return <ShieldAlert className="h-6 w-6 text-primary animate-pulse" />;
     if (currentSection === 'diagnosis') return results ? <CheckCircle2 className="h-6 w-6 text-primary" /> : <HelpCircle className="h-6 w-6 text-primary" />;
-    if (currentSection === 'analytics') return <BarChartIcon className="h-6 w-6 text-primary" />;
-    if (currentSection === 'history') return <CalendarDays className="h-6 w-6 text-primary" />;
+    if (currentSection === 'analytics') return isLoadingAnalytics ? <Loader2 className="h-6 w-6 text-primary animate-spin" /> : <BarChartIcon className="h-6 w-6 text-primary" />;
+    if (currentSection === 'history') return isLoadingHistory ? <Loader2 className="h-6 w-6 text-primary animate-spin" /> : <CalendarDays className="h-6 w-6 text-primary" />;
     return <HelpCircle className="h-6 w-6 text-primary" />;
   };
   
@@ -78,19 +123,19 @@ export default function VerdantVisionDashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight text-foreground">{greeting}</h1>
         <p className="mt-1 text-md text-muted-foreground max-w-3xl">
           Your advanced AI assistant for plant disease detection and management.
+          <span className="block text-xs mt-1">
+            (For full data persistence, please configure Firebase Firestore in your project.)
+          </span>
         </p>
       </header>
 
-      {/* Navigation */}
       <div className="flex space-x-2 mb-6 border-b pb-3">
         <Button variant={currentSection === 'diagnosis' ? 'default' : 'ghost'} onClick={() => setCurrentSection('diagnosis')}>New Diagnosis</Button>
         <Button variant={currentSection === 'analytics' ? 'default' : 'ghost'} onClick={() => setCurrentSection('analytics')}>Analytics</Button>
         <Button variant={currentSection === 'history' ? 'default' : 'ghost'} onClick={() => setCurrentSection('history')}>History & Outcomes</Button>
       </div>
       
-      {/* Main content area */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        {/* Left Column: Upload and Actions (conditionally shown for diagnosis) */}
         {currentSection === 'diagnosis' && (
           <div className="md:col-span-1 space-y-6">
             <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -108,7 +153,7 @@ export default function VerdantVisionDashboardPage() {
                   onDetectionStart={handleDetectionStart}
                   onDetectionComplete={handleDetectionComplete}
                   onDetectionError={handleDetectionError}
-                  isProcessing={isLoading}
+                  isProcessing={isLoadingDiagnosis}
                 />
               </CardContent>
             </Card>
@@ -122,13 +167,11 @@ export default function VerdantVisionDashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">No new alerts. Your plants seem to be doing well based on recent scans!</p>
-                {/* Placeholder for actual alerts */}
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Right/Main Column: Analysis Report / Other sections */}
         <div className={currentSection === 'diagnosis' ? "md:col-span-2" : "md:col-span-3"}>
           <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 min-h-[400px] flex flex-col">
             <CardHeader>
@@ -141,7 +184,7 @@ export default function VerdantVisionDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-              {isLoading && currentSection === 'diagnosis' && (
+              {isLoadingDiagnosis && currentSection === 'diagnosis' && (
                 <div className="space-y-4 p-4">
                   <Skeleton className="h-28 w-full rounded-lg" />
                   <Skeleton className="h-10 w-3/4" />
@@ -149,49 +192,28 @@ export default function VerdantVisionDashboardPage() {
                   <p className="text-center text-primary font-semibold pt-4">Verdant Vision AI is analyzing your plant...</p>
                 </div>
               )}
-              {error && currentSection === 'diagnosis' && (
+              {error && ( // General error display for all sections for simplicity
                 <Alert variant="destructive" className="m-4">
                   <ShieldAlert className="h-5 w-5" />
-                  <AlertTitle>Analysis Error</AlertTitle>
+                  <AlertTitle>Error</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              {!isLoading && !error && results && currentSection === 'diagnosis' && (
+              {!isLoadingDiagnosis && !error && results && currentSection === 'diagnosis' && (
                 <DiseaseResults diagnoses={results.diagnoses} uploadedImage={uploadedImagePreview} />
               )}
-              {!isLoading && !error && !results && currentSection === 'diagnosis' && (
+              {!isLoadingDiagnosis && !error && !results && currentSection === 'diagnosis' && (
                 <div className="text-center text-muted-foreground py-12 flex flex-col items-center justify-center h-full">
                   <HelpCircle className="h-16 w-16 mb-4 opacity-70" />
                   <p className="text-lg">Your plant's health report will appear here.</p>
                   <p className="text-sm">Upload an image to begin diagnosis.</p>
                 </div>
               )}
-              {currentSection === 'analytics' && (
-                 <div className="space-y-6">
-                    <p className="text-sm text-muted-foreground px-1">
-                      Displaying sample data for plant health trends. Full historical analytics coming soon.
-                    </p>
-                    <AnalyticsChartPlaceholder />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                        <Card>
-                            <CardHeader><CardTitle className="text-lg">Overall Health Score</CardTitle></CardHeader>
-                            <CardContent><Skeleton className="w-3/4 h-8" /><p className="text-xs text-muted-foreground mt-2">Average score over the last 30 days.</p></CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader><CardTitle className="text-lg">Most Common Issue</CardTitle></CardHeader>
-                            <CardContent><Skeleton className="w-1/2 h-8" /><p className="text-xs text-muted-foreground mt-2">Identified from recent scans.</p></CardContent>
-                        </Card>
-                    </div>
-                 </div>
+              {currentSection === 'analytics' && !error && (
+                 <AnalyticsDashboard summary={analyticsSummary} isLoading={isLoadingAnalytics} />
               )}
-              {currentSection === 'history' && (
-                <div className="text-center text-muted-foreground py-12 flex flex-col items-center justify-center h-full">
-                  <CalendarDays className="h-16 w-16 mb-4 opacity-70" />
-                  <p className="text-lg">Diagnosis History & Treatment Outcomes</p>
-                  <p className="text-sm">A log of your past plant health analyses and their outcomes will be available here.</p>
-                  <p className="text-xs mt-2">(Feature coming soon)</p>
-                  <Skeleton className="w-full md:w-3/4 lg:w-1/2 h-32 mt-6 rounded-lg" />
-                </div>
+              {currentSection === 'history' && !error && (
+                <DiagnosisHistoryList history={diagnosisHistory} isLoading={isLoadingHistory} />
               )}
             </CardContent>
             {results && currentSection === 'diagnosis' && (
@@ -201,10 +223,12 @@ export default function VerdantVisionDashboardPage() {
                  </p>
               </CardFooter>
             )}
-             {(currentSection === 'analytics' || currentSection === 'history') && (
+             {(currentSection === 'analytics' || currentSection === 'history') && !error &&(
                 <CardFooter className="border-t pt-4">
-                    <p className="text-xs text-muted-foreground">
-                        Note: Analytics and History sections are currently illustrative and will be fully implemented in a future update.
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Info className="h-3 w-3"/>
+                        {currentSection === 'history' ? 'Diagnosis history is currently session-based. ' : 'Analytics are based on session data. '}
+                        Configure Firebase for persistent storage.
                     </p>
                 </CardFooter>
             )}
@@ -214,5 +238,3 @@ export default function VerdantVisionDashboardPage() {
     </div>
   );
 }
-
-    

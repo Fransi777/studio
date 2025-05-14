@@ -5,14 +5,9 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton"
 import type { AnalyticsSummary } from "@/types";
 import { TrendingUp, AlertTriangle, ScanLine, ListChecks } from "lucide-react";
-
-
-// This component is being renamed to AnalyticsDashboard and moved to its own file.
-// Keeping this file for reference during transition or if rollback needed, but it should be deleted eventually.
-// The new component is src/components/AnalyticsDashboard.tsx
 
 const sampleChartData = [
   { month: "January", healthy: 186, diseased: 80 },
@@ -21,7 +16,7 @@ const sampleChartData = [
   { month: "April", healthy: 173, diseased: 90 },
   { month: "May", healthy: 209, diseased: 70 },
   { month: "June", healthy: 214, diseased: 65 },
-]
+];
 
 const chartConfig = {
   healthy: {
@@ -32,15 +27,14 @@ const chartConfig = {
     label: "Diseased Scans",
     color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 interface AnalyticsDashboardProps {
   summary: AnalyticsSummary | null;
   isLoading: boolean;
 }
-// This is a duplicate of AnalyticsDashboard.tsx, which should be the primary one.
-// This file (AnalyticsChartPlaceholder.tsx) can be removed.
-export function AnalyticsChartPlaceholder({ summary, isLoading }: AnalyticsDashboardProps) {
+
+export function AnalyticsDashboard({ summary, isLoading }: AnalyticsDashboardProps) {
   return (
     <div className="space-y-6">
       <Card className="shadow-md">

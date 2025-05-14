@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ChangeEvent, DragEvent } from "react";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, UploadCloud, XCircle, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { performDiseaseDetection } from "@/app/actions";
+import { performDiseaseDetectionAndSave } from "@/app/actions"; // Updated action
 import type { DetectDiseaseOutput } from "@/ai/flows/detect-disease";
 import { cn } from "@/lib/utils";
 
@@ -94,7 +95,6 @@ export function ImageUploadForm({
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    // Optional: Add visual feedback for drag over
   };
   
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -123,7 +123,7 @@ export function ImageUploadForm({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!selectedFile) {
+    if (!selectedFile || !previewUrl) { // Ensure previewUrl is also available
       setUploadError("Please select an image file.");
       return;
     }
@@ -133,18 +133,15 @@ export function ImageUploadForm({
 
     try {
       const photoDataUri = await fileToDataUri(selectedFile);
-      const result = await performDiseaseDetection({ photoDataUri });
+      // Pass previewUrl to the action for saving
+      const result = await performDiseaseDetectionAndSave({ photoDataUri }, previewUrl); 
       
-      if (previewUrl) {
-         onDetectionComplete(result, previewUrl);
-         toast({
-          title: "Analysis Complete",
-          description: "Plant health report is ready.",
-          variant: 'default', // Explicitly default or use custom variant
-        });
-      } else {
-        throw new Error("Image preview was not available.");
-      }
+      onDetectionComplete(result, previewUrl);
+      toast({
+        title: "Analysis Complete",
+        description: "Plant health report is ready and saved to history.",
+        variant: 'default',
+      });
      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";

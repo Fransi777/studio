@@ -13,8 +13,8 @@ export async function performDiseaseDetection(input: DetectDiseaseInput): Promis
       const result = await detectDisease(input);
       // Add a small delay to simulate network latency for better UX perception,
       // but only on successful attempt or if not retrying.
-      if (attempts === 0) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      if (attempts === 0 && (!result.diagnoses || result.diagnoses.length > 0)) { // Only delay if actual results or first try.
+        await new Promise(resolve => setTimeout(resolve, 700));
       }
       return result;
     } catch (error) {
@@ -23,7 +23,7 @@ export async function performDiseaseDetection(input: DetectDiseaseInput): Promis
 
       if (error instanceof Error && error.message.includes("503 Service Unavailable")) {
         if (attempts < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * attempts)); // Exponential backoff could also be used
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * attempts)); // Exponential backoff
           continue; // Retry
         } else {
           // Max retries reached for 503 error
@@ -33,6 +33,13 @@ export async function performDiseaseDetection(input: DetectDiseaseInput): Promis
       
       // For other errors or if max retries reached for non-503 errors
       if (error instanceof Error) {
+        // Check for common Genkit/model errors that might benefit from a user-friendly message
+        if (error.message.includes("SAFETY")) {
+          throw new Error("The analysis could not be completed due to content safety filters. Try a different image or adjust your plant description.");
+        }
+        if (error.message.includes("Invalid media")) {
+          throw new Error("The uploaded image could not be processed. Please try a different image format or a clearer picture.");
+        }
         throw new Error(`Failed to detect disease: ${error.message}`);
       }
       throw new Error("An unknown error occurred during disease detection.");

@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Detects diseases in a plant from an image and returns a diagnosis with confidence levels.
+ * @fileOverview Detects diseases in a plant from an image, returns a diagnosis with confidence levels, and suggests treatments.
  *
  * - detectDisease - A function that handles the plant disease detection process.
  * - DetectDiseaseInput - The input type for the detectDisease function.
@@ -21,17 +21,20 @@ const DetectDiseaseInputSchema = z.object({
 });
 export type DetectDiseaseInput = z.infer<typeof DetectDiseaseInputSchema>;
 
+const DiseaseDiagnosisSchema = z.object({
+  disease: z.string().describe('The name of the potential disease.'),
+  confidence: z
+    .number()
+    .describe('The confidence level of the diagnosis (0-1).'),
+  treatmentSuggestions: z
+    .array(z.string())
+    .describe('Tailored treatment suggestions for the detected disease. Provide 2-3 concise suggestions.'),
+});
+
 const DetectDiseaseOutputSchema = z.object({
   diagnoses: z
-    .array(
-      z.object({
-        disease: z.string().describe('The name of the potential disease.'),
-        confidence: z
-          .number()
-          .describe('The confidence level of the diagnosis (0-1).'),
-      })
-    )
-    .describe('A list of potential diseases and their confidence levels.'),
+    .array(DiseaseDiagnosisSchema)
+    .describe('A list of potential diseases, their confidence levels, and treatment suggestions.'),
 });
 export type DetectDiseaseOutput = z.infer<typeof DetectDiseaseOutputSchema>;
 
@@ -45,7 +48,12 @@ const prompt = ai.definePrompt({
   output: {schema: DetectDiseaseOutputSchema},
   prompt: `You are an expert in plant pathology. Analyze the provided image of a plant and identify any potential diseases.
 
-  Return a list of potential diseases and their confidence levels. The confidence level should be a number between 0 and 1.
+  For each potential disease identified, provide:
+  1. The name of the disease.
+  2. A confidence level for this diagnosis (a number between 0 and 1).
+  3. A list of 2-3 concise, actionable treatment suggestions suitable for a home gardener or farmer.
+
+  If the plant appears healthy or no specific disease can be identified with reasonable confidence, return an empty list for diagnoses.
 
   Image: {{media url=photoDataUri}}`,
 });
@@ -58,6 +66,7 @@ const detectDiseaseFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    // Ensure output is not null, and if diagnoses is null/undefined, default to an empty array.
+    return { diagnoses: output?.diagnoses ?? [] };
   }
 );

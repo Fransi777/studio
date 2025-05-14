@@ -8,94 +8,74 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 96.1%; /* #F5F5F5 Light Gray */
-    --foreground: 240 6% 10%; /* Dark Gray for text */
+    --background: 40 50% 98%; /* Soft Beige */
+    --foreground: 90 30% 20%; /* Dark Greenish Brown */
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 240 6% 10%;
+    --card: 40 30% 99%; /* Lighter Beige for cards, almost white */
+    --card-foreground: 90 30% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 6% 10%;
+    --popover: 40 30% 99%;
+    --popover-foreground: 90 30% 20%;
 
-    --primary: 122 39% 49%; /* #4CAF50 Green */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 120 45% 40%; /* Leaf Green */
+    --primary-foreground: 120 20% 98%; /* Very Light Green/White */
 
-    --secondary: 0 0% 90%; /* Slightly darker gray than background */
-    --secondary-foreground: 240 6% 10%;
+    --secondary: 100 25% 80%; /* Soft Sage Green */
+    --secondary-foreground: 90 30% 20%;
 
-    --muted: 0 0% 94%;
-    --muted-foreground: 240 4% 46%; /* Slightly lighter for muted text */
+    --muted: 100 25% 92%; /* Lighter Sage */
+    --muted-foreground: 90 25% 40%; 
 
-    --accent: 54 93% 62%; /* #FFEB3B Yellow */
-    --accent-foreground: 60 80% 5%; /* Dark brown/black for text on yellow */
+    --accent: 30 70% 60%; /* Warm Terracotta */
+    --accent-foreground: 30 30% 15%; /* Dark Brown for text on accent */
 
-    --destructive: 0 72.2% 50.6%; /* Adjusted for better contrast if needed */
+    --destructive: 0 60% 50%; 
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 122 39% 49%; /* Green for focus rings */
+    --border: 110 20% 85%; /* Softer border */
+    --input: 110 20% 90%; /* Softer input background */
+    --ring: 120 45% 45%; /* Leaf Green for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Slightly larger radius for modern feel */
 
-    --chart-1: 122 39% 49%; /* Green */
-    --chart-2: 54 93% 62%; /* Yellow */
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-
-    /* Sidebar specific colors - can keep as default or adjust if sidebar is used extensively */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 120 45% 40%; /* Leaf Green */
+    --chart-2: 30 70% 60%;  /* Warm Terracotta */
+    --chart-3: 197 37% 34%; /* Deeper Teal */
+    --chart-4: 43 74% 56%; /* Softer Yellow/Gold */
+    --chart-5: 27 87% 57%; /* Softer Orange */
   }
 
   .dark {
-    /* Keeping dark mode fairly standard, can be themed later if needed */
-    --background: 240 6% 10%;
-    --foreground: 0 0% 96.1%;
+    --background: 90 15% 15%; /* Dark Olive/Forest Green */
+    --foreground: 40 30% 90%; /* Light Beige/Off-white */
 
-    --card: 240 6% 12%;
-    --card-foreground: 0 0% 96.1%;
+    --card: 90 15% 18%; /* Slightly Lighter Dark Olive */
+    --card-foreground: 40 30% 90%;
 
-    --popover: 240 6% 12%;
-    --popover-foreground: 0 0% 96.1%;
+    --popover: 90 15% 18%;
+    --popover-foreground: 40 30% 90%;
 
-    --primary: 122 39% 55%; /* Lighter Green for dark mode */
-    --primary-foreground: 0 0% 10%;
+    --primary: 120 40% 55%; /* Brighter Leaf Green */
+    --primary-foreground: 120 15% 10%; /* Dark text for on green */
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 100 15% 30%; /* Darker Sage */
+    --secondary-foreground: 40 30% 90%;
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 100 15% 25%;
+    --muted-foreground: 40 25% 70%; 
 
-    --accent: 54 93% 65%; /* Lighter Yellow for dark mode */
-    --accent-foreground: 60 80% 5%;
+    --accent: 30 60% 50%; /* Muted Terracotta */
+    --accent-foreground: 30 15% 95%; /* Light text for on accent */
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 50% 45%; 
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 122 39% 55%;
+    --border: 100 10% 30%;
+    --input: 100 10% 25%;
+    --ring: 120 40% 55%;
 
-    --chart-1: 122 39% 55%;
-    --chart-2: 54 93% 65%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 122 39% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 122 39% 55%;
+    --chart-1: 120 40% 55%;
+    --chart-2: 30 60% 50%;
   }
 }
 

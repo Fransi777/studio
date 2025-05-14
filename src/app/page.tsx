@@ -152,7 +152,7 @@ export default function PlantIQDashboardPage() {
     temp: "24°C",
     humidity: "65%",
     light: "Bright",
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    time: null as string | null // Initialize time as null
   });
   
   useEffect(() => {
@@ -161,6 +161,12 @@ export default function PlantIQDashboardPage() {
     else if (hour < 18) setGreeting("Good Afternoon! Let's analyze your plant's health with PlantIQ.");
     else setGreeting("Good Evening! Upload an image to get started with PlantIQ.");
     
+    // Set time on client-side after mount
+    setWeatherConditions(prev => ({
+      ...prev,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }));
+
     // Update time every minute
     const timeInterval = setInterval(() => {
       setWeatherConditions(prev => ({
@@ -204,7 +210,7 @@ export default function PlantIQDashboardPage() {
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-1 text-sm bg-secondary/50 px-3 py-1 rounded-md">
                   <SunMedium className="h-4 w-4 text-amber-500" />
-                  <span>{weatherConditions.time}</span>
+                  <span>{weatherConditions.time || 'Loading...'}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
